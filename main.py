@@ -1,15 +1,19 @@
 from datetime import date
-import psycopg2
+from psycopg2.pool import SimpleConnectionPool
 import config
 
 
-connection = psycopg2.connect(
+pool = SimpleConnectionPool(
+    minconn=1,
+    maxconn=5,
     host=config.HOST,
     port=config.PORT,
     user=config.USER,
     password=config.PASSWORD,
     dbname=config.DBNAME
 )
+
+connection = pool.getconn()
 
 cursor = connection.cursor()
 
@@ -51,3 +55,4 @@ cursor.close()
 connection.commit()
 connection.close()
 
+pool.putconn(connection)
